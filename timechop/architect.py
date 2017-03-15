@@ -9,10 +9,8 @@ from dateutil.relativedelta import relativedelta
 
 class Architect(object):
 
-    def __init__(self, batch_id, batch_timestamp, beginning_of_time,
-                 label_names, label_types, db_config, user_metadata, engine):
-        self.batch_id = batch_id
-        self.batch_timestamp = batch_timestamp
+    def __init__(self, beginning_of_time, label_names, label_types, db_config,
+                 user_metadata, engine):
         self.beginning_of_time = beginning_of_time # earliest time included in features
         self.label_names = label_names
         self.label_types = label_types
@@ -22,26 +20,33 @@ class Architect(object):
 
     def chop_data(self, matrix_set_definitions):
         updated_definitions = []
+        uuids = set()
         for matrix_set in matrix_set_definitions:
             for label_name, label_type in itertools.product(self.label_names, self.label_types):
                 matrix_set['train_uuid'] = self.design_matrix(
                     matrix_definition = matrix_set['train_matrix'],
                     label_name = label_name,
-                    label_type = label_type
+                    label_type = label_type,
+                    completed_uuids = uuids
                 )
+                uuids.add(matrix_set['train_uuid'])
                 test_uuids = []
                 for test_matrix in matrix_set['test_matrices']:
                     test_uuid = self.design_matrix(
                         matrix_definition = test_matrix,
                         label_name = label_name,
-                        label_type = label_type
+                        label_type = label_type,
+                        completed_uuids = uuids
                     )
                     test_uuids.append(test_uuid)
+                    uuids.add(test_uuid)
                 matrix_set['test_uuids'] = test_uuids
                 updated_definitions.append(matrix_set)
+
         return(updated_definitions)
 
-    def design_matrix(self, matrix_definition, label_name, label_type):
+    def design_matrix(self, matrix_definition, label_name, label_type,
+                      completed_uuids):
         """ Generate matrix metadata and, if no such matrix has already been
         made this batch, build the matrix.
 
@@ -79,7 +84,7 @@ class Architect(object):
         uuid = metta.generate_uuid(matrix_metadata)
         matrix_filename = '{}.csv'.format(uuid)
 
-        if not os.path.isfile(matrix_filename):
+        if uuid not in completed_uuids:
             self.build_matrix(
                 matrix_definition['as_of_times'],
                 label_name,
@@ -273,8 +278,6 @@ class Architect(object):
             # other information
             'label_type': label_type,
             'matrix_id': matrix_id,
-            'batch_id': self.batch_id,
-            'batch_timestamp': self.batch_timestamp
 
         }
         matrix_metadata.update(matrix_definition)

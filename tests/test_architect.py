@@ -125,8 +125,6 @@ def test_build_labels_query():
         create_features_and_labels_schemas(engine, features_tables, labels)
 
         matrix_maker = Architect(
-            batch_id = 2,
-            batch_timestamp = datetime.datetime(2017, 3, 1, 12, 0),
             beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
             label_names = ['booking'],
             label_types = ['binary'],
@@ -172,8 +170,6 @@ def test_write_to_csv():
         create_features_and_labels_schemas(engine, features_tables, labels)
 
         matrix_maker = Architect(
-            batch_id = 2,
-            batch_timestamp = datetime.datetime(2017, 3, 1, 12, 0),
             beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
             label_names = ['booking'],
             label_types = ['binary'],
@@ -214,8 +210,6 @@ def test_make_entity_dates_table():
         create_features_and_labels_schemas(engine, features_tables, labels)
 
         matrix_maker = Architect(
-            batch_id = 2,
-            batch_timestamp = datetime.datetime(2017, 3, 1, 12, 0),
             beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
             label_names = ['booking'],
             label_types = ['binary'],
@@ -282,8 +276,6 @@ def test_build_features_query():
         create_features_and_labels_schemas(engine, features_tables, labels)
 
         matrix_maker = Architect(
-            batch_id = 2,
-            batch_timestamp = datetime.datetime(2017, 3, 1, 12, 0),
             beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
             label_names = ['booking'],
             label_types = ['binary'],
@@ -313,8 +305,6 @@ def test_build_features_query():
 class TestMergeFeatureCSVs(TestCase):
     def test_merge_feature_csvs(self):
         matrix_maker = Architect(
-            batch_id = 2,
-            batch_timestamp = datetime.datetime(2017, 3, 1, 12, 0),
             beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
             label_names = ['booking'],
             label_types = ['binary'],
@@ -378,8 +368,6 @@ class TestMergeFeatureCSVs(TestCase):
 
     def test_badinput(self):
         matrix_maker = Architect(
-            batch_id = 2,
-            batch_timestamp = datetime.datetime(2017, 3, 1, 12, 0),
             beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
             label_names = ['booking'],
             label_types = ['binary'],
@@ -438,8 +426,6 @@ def test_design_matrix():
                  datetime.datetime(2016, 3, 1, 0, 0)]
 
         matrix_maker = Architect(
-            batch_id = 2,
-            batch_timestamp = datetime.datetime.now(),
             beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
             label_names = ['booking'],
             label_types = ['binary'],
@@ -457,7 +443,8 @@ def test_design_matrix():
         uuid = matrix_maker.design_matrix(
             matrix_definition = matrix_dates,
             label_name = 'booking',
-            label_type = 'binary'
+            label_type = 'binary',
+            completed_uuids = set()
         )
 
         matrix_filename = '{}.csv'.format(uuid)

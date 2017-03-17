@@ -20,26 +20,26 @@ class Architect(object):
 
     def chop_data(self, matrix_set_definitions):
         updated_definitions = []
-        uuids = set()
+        completed_uuids = set()
         for matrix_set in matrix_set_definitions:
             for label_name, label_type in itertools.product(self.label_names, self.label_types):
                 matrix_set['train_uuid'] = self.design_matrix(
                     matrix_definition = matrix_set['train_matrix'],
                     label_name = label_name,
                     label_type = label_type,
-                    completed_uuids = uuids
+                    completed_uuids = completed_uuids
                 )
-                uuids.add(matrix_set['train_uuid'])
+                completed_uuids.add(matrix_set['train_uuid'])
                 test_uuids = []
                 for test_matrix in matrix_set['test_matrices']:
                     test_uuid = self.design_matrix(
                         matrix_definition = test_matrix,
                         label_name = label_name,
                         label_type = label_type,
-                        completed_uuids = uuids
+                        completed_uuids = completed_uuids
                     )
                     test_uuids.append(test_uuid)
-                    uuids.add(test_uuid)
+                    completed_uuids.add(test_uuid)
                 matrix_set['test_uuids'] = test_uuids
                 updated_definitions.append(matrix_set)
 

@@ -1,6 +1,7 @@
 from timechop.timechop import Inspections
 import datetime
 from unittest import TestCase
+import warnings
 
 class test_calculate_update_times(TestCase):
     def test_valid_input(self):
@@ -228,8 +229,15 @@ class test_chop_time(TestCase):
             update_window = '5 days',
             look_back_durations = ['7 days']
         )
-        result = chopper.chop_time()
-        assert(result == expected_result)
+        
+        with warnings.catch_warnings(record = True) as w:
+            warnings.simplefilter("always")
+            result = chopper.chop_time()
+            assert result == expected_result
+            assert len(w) == 1
+            assert issubclass(w[-1].category, UserWarning)
+            assert 'update' in str(w[-1].message)
+
 
     def test_unevenly_divisible_update_window(self):
         expected_result = [
@@ -270,8 +278,14 @@ class test_chop_time(TestCase):
             update_window = '6 days',
             look_back_durations = ['5 days']
         )
-        result = chopper.chop_time()
-        assert(result == expected_result)
+        
+        with warnings.catch_warnings(record = True) as w:
+            warnings.simplefilter("always")
+            result = chopper.chop_time()
+            assert result == expected_result
+            assert len(w) == 1
+            assert issubclass(w[-1].category, UserWarning)
+            assert 'update' in str(w[-1].message)
 
 
 class test__init__(TestCase):

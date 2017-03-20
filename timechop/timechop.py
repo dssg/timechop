@@ -42,9 +42,9 @@ class Inspections(object):
             matrix_end_time -= update_delta
             matrix_start_time = matrix_end_time - look_back_delta
 
-        if matrix_end_time != self.modeling_start_time:
+        if (matrix_start_time != self.modeling_start_time):
             warnings.warn('''Modeling period not evenly divisbile by update
-                windows. Matrix end times:
+                windows and/or look back durations. Matrix end times: {}
             '''.format(matrix_end_times))
 
         return(matrix_end_times)
@@ -63,7 +63,7 @@ class Inspections(object):
         print('train end: {}'.format(train_matrix_end_time))
         print('train start: {}'.format(train_matrix_start_time))
         if train_matrix_start_time < self.modeling_start_time:
-            raise ValueError('''Update period not evenly divisbile by look back
+            raise ValueError('''Update period not evenly divisbile by lookback
                 time. Matrix start time {} earlier than modeling start time {}.
             '''.format(train_matrix_start_time, self.modeling_start_time))
         train_as_of_times = self.calculate_as_of_times(

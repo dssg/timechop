@@ -93,7 +93,7 @@ class test_parse_delta_string(unittest.TestCase):
             assert(result == expected_results[index])
 
     def test_invalid_input(self):
-        delta_strings = ['one year', '1yr', 'one_year']
+        delta_strings = ['one year', '1yr', 'one_year', 'ay']
         for delta_string in delta_strings:
             with self.assertRaises(ValueError):
                 parse_delta_string(delta_string)

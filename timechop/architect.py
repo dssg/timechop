@@ -133,7 +133,7 @@ class Architect(object):
         """
         matrix_filename = os.path.join(
             matrix_directory,
-            '{}.csv'.format(matrix_uuid)
+            'tmp_{}.csv'.format(matrix_uuid)
         )
         logging.info('Creating matrix %s > %s', matrix_metadata['matrix_id'], matrix_filename)
         # make the entity time table and query the labels and features tables
@@ -181,13 +181,13 @@ class Architect(object):
         # clean up files and database before finishing
         for csv_name in features_csv_names:
             os.remove(csv_name)
+        os.remove(matrix_filename)
         self.engine.execute(
             'drop table "{}"."{}";'.format(
                 self.db_config['features_schema_name'],
                 entity_date_table_name
             )
         )
-
 
     def write_labels_data(self, as_of_times, label_name, label_type,
                           matrix_type, entity_date_table_name, matrix_uuid):

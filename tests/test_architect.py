@@ -572,7 +572,7 @@ class TestBuildMatrix(object):
 
                 matrix_filename = os.path.join(
                     temp_dir,
-                    '{}.csv'.format(uuid)
+                    'tmp_{}.csv'.format(uuid)
                 )
                 with open(matrix_filename, 'r') as f:
                     reader = csv.reader(f)
@@ -629,7 +629,7 @@ class TestBuildMatrix(object):
 
                 matrix_filename = os.path.join(
                     temp_dir,
-                    '{}.csv'.format(uuid)
+                    'tmp_{}.csv'.format(uuid)
                 )
 
                 with open(matrix_filename, 'r') as f:

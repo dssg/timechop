@@ -11,6 +11,7 @@ import pandas as pd
 import os
 from sqlalchemy import create_engine
 from unittest import TestCase
+from metta import metta_io as metta
 
 
 # make some fake features data
@@ -551,28 +552,28 @@ class TestBuildMatrix(object):
                     'features0': ['f1', 'f2'],
                     'features1': ['f1', 'f2'],
                 }
-
-                uuid = '1234'
+                matrix_metadata = {
+                    'matrix_id': 'hi',
+                    'label_name': 'booking',
+                    'end_time': datetime.datetime(2016, 3, 1, 0, 0),
+                    'start_time': datetime.datetime(2016, 1, 1, 0, 0),
+                    'prediction_window': '1d'
+                }
+                uuid = metta.generate_uuid(matrix_metadata)
                 matrix_maker.build_matrix(
                     as_of_times = dates,
                     label_name = 'booking',
                     label_type = 'binary',
                     feature_dictionary = feature_dictionary,
                     matrix_directory = temp_dir,
-                    matrix_metadata = {
-                        'matrix_id': 'hi',
-                        'label_name': 'booking',
-                        'end_time': datetime.datetime(2016, 3, 1, 0, 0),
-                        'start_time': datetime.datetime(2016, 1, 1, 0, 0),
-                        'prediction_window': '1d'
-                    },
+                    matrix_metadata = matrix_metadata,
                     matrix_uuid = uuid,
                     matrix_type = 'train'
                 )
 
                 matrix_filename = os.path.join(
                     temp_dir,
-                    'tmp_{}.csv'.format(uuid)
+                    '{}.csv'.format(uuid)
                 )
                 with open(matrix_filename, 'r') as f:
                     reader = csv.reader(f)
@@ -608,28 +609,28 @@ class TestBuildMatrix(object):
                     'features0': ['f1', 'f2'],
                     'features1': ['f1', 'f2'],
                 }
-
-                uuid = '1234'
+                matrix_metadata = {
+                    'matrix_id': 'hi',
+                    'label_name': 'booking',
+                    'end_time': datetime.datetime(2016, 3, 1, 0, 0),
+                    'start_time': datetime.datetime(2016, 1, 1, 0, 0),
+                    'prediction_window': '1d'
+                }
+                uuid = metta.generate_uuid(matrix_metadata)
                 matrix_maker.build_matrix(
                     as_of_times = dates,
                     label_name = 'booking',
                     label_type = 'binary',
                     feature_dictionary = feature_dictionary,
                     matrix_directory = temp_dir,
-                    matrix_metadata = {
-                        'matrix_id': 'hi',
-                        'label_name': 'booking',
-                        'end_time': datetime.datetime(2016, 3, 1, 0, 0),
-                        'start_time': datetime.datetime(2016, 1, 1, 0, 0),
-                        'prediction_window': '1d'
-                    },
+                    matrix_metadata = matrix_metadata,
                     matrix_uuid = uuid,
                     matrix_type = 'test'
                 )
-
+                print(os.listdir(temp_dir))
                 matrix_filename = os.path.join(
                     temp_dir,
-                    'tmp_{}.csv'.format(uuid)
+                    '{}.csv'.format(uuid)
                 )
 
                 with open(matrix_filename, 'r') as f:

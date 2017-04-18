@@ -136,7 +136,12 @@ class Architect(object):
             matrix_directory,
             'tmp_{}.csv'.format(matrix_uuid)
         )
-        if not self.replace and os.path.exists(matrix_filename):
+        if not self.replace and os.path.exists(
+            os.path.join(
+                matrix_directory,
+                '{}.csv'.format(matrix_uuid)
+            )
+        ):
             logging.info('Skipping %s because matrix already exists', matrix_filename)
             return
 

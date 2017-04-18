@@ -12,6 +12,7 @@ addons:
 before_install:
 - sudo apt-get update
 - sudo apt-get install libblas-dev liblapack-dev libatlas-base-dev gfortran
+- sudo apt-get install libhdf5-serial-dev
 install:
 - pip install -r requirements.txt
 script: py.test -vvv -s --cov=timechop

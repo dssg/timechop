@@ -705,13 +705,7 @@ class TestBuildMatrix(object):
                     label_type = 'binary',
                     feature_dictionary = feature_dictionary,
                     matrix_directory = temp_dir,
-                    matrix_metadata = {
-                        'matrix_id': 'hi',
-                        'label_name': 'booking',
-                        'end_time': datetime.datetime(2016, 3, 1, 0, 0),
-                        'start_time': datetime.datetime(2016, 1, 1, 0, 0),
-                        'prediction_window': '1d'
-                    },
+                    matrix_metadata = matrix_metadata,
                     matrix_uuid = uuid,
                     matrix_type = 'test'
                 )

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import copy
 import os
 import csv
@@ -7,12 +6,7 @@ import itertools
 
 from metta import metta_io as metta
 
-from . import utils
-=======
-import itertools
-from metta import metta_io as metta
 from . import builders, utils
->>>>>>> edfd915faab7d8e5a9d9e9f5c2f5b78957fde91d
 
 
 class Architect(object):

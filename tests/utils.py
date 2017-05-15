@@ -11,7 +11,7 @@ def convert_string_column_to_date(column):
         [datetime.datetime.strptime(date, '%Y-%m-%d').date() for date in column]
     )
 
-def create_features_and_labels_schemas(engine, features_tables, labels):
+def create_schemas(engine, features_tables, labels, entities):
     """ This function makes a features schema and populates it with the fake
     data from above.
 
@@ -41,6 +41,18 @@ def create_features_and_labels_schemas(engine, features_tables, labels):
             'insert into labels.labels values (%s, %s, %s, %s, %s, %s)',
             row
         )
+    # create entities table
+    engine.execute('drop table if exists staging cascade; create schema staging;')
+    engine.execute(
+        """
+            create table staging.entities (
+                entity_id int
+            )
+        """
+    )
+    for entity in entities:
+        engine.execute('insert into staging.entities values (%s)', entity)
+
 
 def create_features_table(table_number, table, engine):
     engine.execute(
@@ -62,6 +74,7 @@ def create_entity_date_df(
     dates,
     labels,
     as_of_dates,
+    entities,
     label_name,
     label_type,
     label_window
@@ -89,6 +102,7 @@ def create_entity_date_df(
         '%Y-%m-%d'
     ).date() for date in ids_dates['as_of_date']]
     ids_dates = ids_dates[ids_dates['as_of_date'].isin(dates)]
+    ids_dates = ids_dates[ids_dates['entity_id'].isin(entities)]
     print(ids_dates)
     print(dates)
 

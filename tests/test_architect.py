@@ -1,19 +1,21 @@
 from timechop.architect import Architect
 from timechop import builders
-from tests.utils import create_features_and_labels_schemas
+from tests.utils import create_schemas
 from tests.utils import create_entity_date_df
 from tests.utils import convert_string_column_to_date
 from tests.utils import NamedTempFile
 from tests.utils import TemporaryDirectory
+
 import testing.postgresql
 import csv
 import datetime
 import pandas as pd
 import os
-from sqlalchemy import create_engine
 from unittest import TestCase
+from sqlalchemy import create_engine
 from metta import metta_io as metta
 from mock import Mock
+import pytest
 
 
 # make some fake features data
@@ -132,6 +134,7 @@ db_config = {
     'features_schema_name': 'features',
     'labels_schema_name': 'labels',
     'labels_table_name': 'labels',
+    'entities_table_name': 'staging.entities'
 }
 
 def test_build_labels_query():
@@ -141,11 +144,12 @@ def test_build_labels_query():
     # set up labeling config variables
     dates = [datetime.datetime(2016, 1, 1, 0, 0),
              datetime.datetime(2016, 2, 1, 0, 0)]
+    entities = [0, 1, 3]
 
     with testing.postgresql.Postgresql() as postgresql:
         # create an engine and generate a table with fake feature data
         engine = create_engine(postgresql.url())
-        create_features_and_labels_schemas(engine, features_tables, labels)
+        create_schemas(engine, features_tables, labels, entities)
 
     # make a dataframe of labels to test against
     labels_df = pd.DataFrame(
@@ -160,11 +164,17 @@ def test_build_labels_query():
         ]
     )
     labels_df['as_of_date'] = convert_string_column_to_date(labels_df['as_of_date'])
-
+    labels_df = labels_df[labels_df['entity_id'].isin(entities)]
+    
     # create an engine and generate a table with fake feature data
     with testing.postgresql.Postgresql() as postgresql:
         engine = create_engine(postgresql.url())
-        create_features_and_labels_schemas(engine, features_tables, labels)
+        create_schemas(
+            engine=engine,
+            features_tables=features_tables,
+            labels=labels,
+            entities=entities
+        )
         with TemporaryDirectory() as temp_dir:
             architect = Architect(
                 beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
@@ -208,10 +218,16 @@ def test_write_to_csv():
     """ Test the write_to_csv function by checking whether the csv contains the
     correct number of lines.
     """
+    entities = [0, 2, 3]
     with testing.postgresql.Postgresql() as postgresql:
         # create an engine and generate a table with fake feature data
         engine = create_engine(postgresql.url())
-        create_features_and_labels_schemas(engine, features_tables, labels)
+        create_schemas(
+            engine=engine,
+            features_tables=features_tables,
+            labels=labels,
+            entities=entities
+        )
 
         with TemporaryDirectory() as temp_dir:
             architect = Architect(
@@ -239,7 +255,6 @@ def test_write_to_csv():
                     reader = csv.reader(f)
                     assert(len([row for row in reader]) == len(table) + 1)
 
-
 def test_make_entity_date_table():
     """ Test that the make_entity_date_table function contains the correct
     values.
@@ -248,11 +263,14 @@ def test_make_entity_date_table():
              datetime.datetime(2016, 2, 1, 0, 0),
              datetime.datetime(2016, 3, 1, 0, 0)]
 
+    entities = [0, 1, 2]
+
     # make a dataframe of entity ids and dates to test against
     ids_dates = create_entity_date_df(
         dates,
         labels,
         dates,
+        entities,
         'booking',
         'binary',
         '1 month'
@@ -261,7 +279,12 @@ def test_make_entity_date_table():
     with testing.postgresql.Postgresql() as postgresql:
         # create an engine and generate a table with fake feature data
         engine = create_engine(postgresql.url())
-        create_features_and_labels_schemas(engine, features_tables, labels)
+        create_schemas(
+            engine=engine,
+            features_tables=features_tables,
+            labels=labels,
+            entities=entities
+        )
 
         with TemporaryDirectory() as temp_dir:
             architect = Architect(
@@ -281,7 +304,6 @@ def test_make_entity_date_table():
                 as_of_times=dates,
                 label_type='binary',
                 label_name='booking',
-                feature_table_names=['features0', 'features1'],
                 matrix_uuid='my_uuid',
                 matrix_type='train',
                 label_window='1 month'
@@ -289,7 +311,7 @@ def test_make_entity_date_table():
 
             # read in the table
             result = pd.read_sql(
-                "select * from features.{} order by entity_id, as_of_date".format(entity_date_table_name),
+                "select * from {} order by entity_id, as_of_date".format(entity_date_table_name),
                 engine
             )
             labels_df = pd.read_sql('select * from labels.labels', engine)
@@ -305,17 +327,28 @@ def test_make_entity_date_table():
             print(test)
             assert(test.all().all())
 
+            # test that the table disappears after session closes
+            engine.dispose()
+            engine2 = create_engine(postgresql.url())
+            try:
+                engine2.execute('select * from {}'.format(entity_date_table_name))
+            except:
+                programmingerror = True
+            assert(programmingerror)
+
 def test_build_outer_join_query():
     """ 
     """
     dates = [datetime.datetime(2016, 1, 1, 0, 0),
              datetime.datetime(2016, 2, 1, 0, 0)]
 
+    entities = [1, 2, 3]
     # make dataframe for entity ids and dates
     ids_dates = create_entity_date_df(
         dates,
         labels,
         dates,
+        entities,
         'booking',
         'binary',
         '1 month'
@@ -342,8 +375,12 @@ def test_build_outer_join_query():
     # create an engine and generate a table with fake feature data
     with testing.postgresql.Postgresql() as postgresql:
         engine = create_engine(postgresql.url())
-        create_features_and_labels_schemas(engine, features_tables, labels)
-
+        create_schemas(
+            engine=engine,
+            features_tables=features_tables,
+            labels=labels,
+            entities=entities
+        )
         with TemporaryDirectory() as temp_dir:
             architect = Architect(
                 beginning_of_time = datetime.datetime(2010, 1, 1, 0, 0),
@@ -360,7 +397,6 @@ def test_build_outer_join_query():
                 as_of_times=dates,
                 label_type='binary',
                 label_name='booking',
-                feature_table_names=['features0', 'features1'],
                 matrix_type='train',
                 matrix_uuid='my_uuid',
                 label_window='1 month'
@@ -373,7 +409,7 @@ def test_build_outer_join_query():
                 query = architect.builder.build_outer_join_query(
                     as_of_times = dates,
                     right_table_name = 'features.{}'.format(table_name),
-                    entity_date_table_name = 'features.{}'.format(entity_date_table_name),
+                    entity_date_table_name = entity_date_table_name,
                     right_column_selections = architect.builder._format_imputations(
                         features[table_number]
                     )
@@ -596,14 +632,21 @@ def test_generate_plans():
 
 class TestBuildMatrix(object):
     def test_train_matrix(self):
+        dates = [
+            datetime.datetime(2016, 1, 1, 0, 0),
+            datetime.datetime(2016, 2, 1, 0, 0),
+            datetime.datetime(2016, 3, 1, 0, 0)
+        ]
+        entities = [0, 1, 2]
         with testing.postgresql.Postgresql() as postgresql:
             # create an engine and generate a table with fake feature data
             engine = create_engine(postgresql.url())
-            create_features_and_labels_schemas(engine, features_tables, labels)
-
-            dates = [datetime.datetime(2016, 1, 1, 0, 0),
-                     datetime.datetime(2016, 2, 1, 0, 0),
-                     datetime.datetime(2016, 3, 1, 0, 0)]
+            create_schemas(
+                engine=engine,
+                features_tables=features_tables,
+                labels=labels,
+                entities=entities
+            )
 
             with TemporaryDirectory() as temp_dir:
                 architect = Architect(
@@ -644,17 +687,25 @@ class TestBuildMatrix(object):
                 )
                 with open(matrix_filename, 'r') as f:
                     reader = csv.reader(f)
-                    assert(len([row for row in reader]) == 12)
+                    assert(len([row for row in reader]) == 9)
 
     def test_test_matrix(self):
+        dates = [
+            datetime.datetime(2016, 1, 1, 0, 0),
+            datetime.datetime(2016, 2, 1, 0, 0),
+            datetime.datetime(2016, 3, 1, 0, 0)
+        ]
+        entities = [0, 1, 3]
+
         with testing.postgresql.Postgresql() as postgresql:
             # create an engine and generate a table with fake feature data
             engine = create_engine(postgresql.url())
-            create_features_and_labels_schemas(engine, features_tables, labels)
-
-            dates = [datetime.datetime(2016, 1, 1, 0, 0),
-                     datetime.datetime(2016, 2, 1, 0, 0),
-                     datetime.datetime(2016, 3, 1, 0, 0)]
+            create_schemas(
+                engine=engine,
+                features_tables=features_tables,
+                labels=labels,
+                entities=entities
+            )
 
             with TemporaryDirectory() as temp_dir:
                 architect = Architect(
@@ -702,17 +753,25 @@ class TestBuildMatrix(object):
 
                 with open(matrix_filename, 'r') as f:
                     reader = csv.reader(f)
-                    assert(len([row for row in reader]) == 13)
+                    assert(len([row for row in reader]) == 10)
 
     def test_replace(self):
+        dates = [
+            datetime.datetime(2016, 1, 1, 0, 0),
+            datetime.datetime(2016, 2, 1, 0, 0),
+            datetime.datetime(2016, 3, 1, 0, 0)
+        ]
+        entities = [0, 2, 3]
+
         with testing.postgresql.Postgresql() as postgresql:
             # create an engine and generate a table with fake feature data
             engine = create_engine(postgresql.url())
-            create_features_and_labels_schemas(engine, features_tables, labels)
-
-            dates = [datetime.datetime(2016, 1, 1, 0, 0),
-                     datetime.datetime(2016, 2, 1, 0, 0),
-                     datetime.datetime(2016, 3, 1, 0, 0)]
+            create_schemas(
+                engine=engine,
+                features_tables=features_tables,
+                labels=labels,
+                entities=entities
+            )
 
             with TemporaryDirectory() as temp_dir:
                 architect = Architect(
@@ -761,7 +820,7 @@ class TestBuildMatrix(object):
 
                 with open(matrix_filename, 'r') as f:
                     reader = csv.reader(f)
-                    assert(len([row for row in reader]) == 13)
+                    assert(len([row for row in reader]) == 10)
 
                 # rerun
                 architect.builder.make_entity_date_table = Mock()

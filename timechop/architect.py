@@ -11,12 +11,23 @@ from . import builders, utils
 
 class Architect(object):
 
-    def __init__(self, beginning_of_time, label_names, label_types, db_config,
-                 matrix_directory, user_metadata, engine,
-                 builder_class=builders.HighMemoryCSVBuilder, replace=True):
+    def __init__(
+        self,
+        beginning_of_time,
+        label_names,
+        label_types,
+        states,
+        db_config,
+        matrix_directory,
+        user_metadata,
+        engine,
+        builder_class=builders.HighMemoryCSVBuilder,
+        replace=True
+    ):
         self.beginning_of_time = beginning_of_time # earliest time included in features
         self.label_names = label_names
         self.label_types = label_types
+        self.states = states
         self.db_config = db_config
         self.matrix_directory = matrix_directory
         self.user_metadata = user_metadata
@@ -47,8 +58,15 @@ class Architect(object):
             'matrix_type': matrix_metadata['matrix_type']
         }
 
-    def _make_metadata(self, matrix_definition, feature_dictionary, label_name,
-                       label_type, matrix_type):
+    def _make_metadata(
+        self,
+        matrix_definition,
+        feature_dictionary,
+        label_name,
+        label_type,
+        state,
+        matrix_type
+    ):
         """ Generate dictionary of matrix metadata.
 
         :param matrix_definition: temporal definition of matrix
@@ -86,6 +104,7 @@ class Architect(object):
 
             # other information
             'label_type': label_type,
+            'state': state,
             'matrix_id': matrix_id,
             'matrix_type': matrix_type
 
@@ -113,9 +132,10 @@ class Architect(object):
         build_tasks = dict()
         for matrix_set in matrix_set_definitions:
             train_matrix = matrix_set['train_matrix']
-            for label_name, label_type, feature_dictionary in itertools.product(
+            for label_name, label_type, state, feature_dictionary in itertools.product(
                 self.label_names,
                 self.label_types,
+                self.states,
                 feature_dictionaries
             ):
                 matrix_set_clone = copy.deepcopy(matrix_set)
@@ -125,6 +145,7 @@ class Architect(object):
                     feature_dictionary,
                     label_name,
                     label_type,
+                    state,
                     'train',
                 )
                 train_uuid = metta.generate_uuid(train_metadata)
@@ -144,6 +165,7 @@ class Architect(object):
                         feature_dictionary,
                         label_name,
                         label_type,
+                        state,
                         'test',
                     )
                     test_uuid = metta.generate_uuid(test_metadata)

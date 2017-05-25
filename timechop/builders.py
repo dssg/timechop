@@ -44,6 +44,7 @@ class BuilderBase(object):
             final_column,
             label_name,
             label_type,
+            state,
             label_window
         ):
         """ Given a table, schema, and list of dates, write a query to get the
@@ -61,21 +62,24 @@ class BuilderBase(object):
         """
         as_of_time_strings = [str(as_of_time) for as_of_time in as_of_times]
         query = """
-            SELECT entity_id,
-                   as_of_date{labels}
-            FROM {labels_schema_name}.{labels_table_name}
-            INNER JOIN {entities_table} USING(entity_id)
-            WHERE as_of_date IN (SELECT (UNNEST (ARRAY{times}::timestamp[]))) AND
+            SELECT l.entity_id,
+                   l.as_of_date{labels}
+            FROM {labels_schema_name}.{labels_table_name} l
+            JOIN {states_table} s
+              ON l.entity_id = s.entity_id
+            WHERE l.as_of_date IN (SELECT (UNNEST (ARRAY{times}::timestamp[]))) AND
                   label_name = '{l_name}' AND
                   label_type = '{l_type}' AND
-                  label_window = '{window}'
-            ORDER BY entity_id,
-                     as_of_date
+                  label_window = '{window}' AND
+                  {state_string}
+            ORDER BY l.entity_id,
+                     l.as_of_date
         """.format(
             labels=final_column,
             labels_schema_name=self.db_config['labels_schema_name'],
             labels_table_name=self.db_config['labels_table_name'],
-            entities_table=self.db_config['entities_table_name'],
+            states_table=self.db_config['sparse_state_table_name'],
+            state_string=state,
             times=as_of_time_strings,
             l_name=label_name,
             l_type=label_type,
@@ -140,6 +144,7 @@ class BuilderBase(object):
         as_of_times,
         label_name,
         label_type,
+        state,
         matrix_type,
         matrix_uuid,
         label_window
@@ -161,12 +166,11 @@ class BuilderBase(object):
                 final_column='',
                 label_name=label_name,
                 label_type=label_type,
+                state=state,
                 label_window=label_window
             )
         elif matrix_type == 'test':
-            indices_query = self.get_all_valid_entity_date_combos(
-                as_of_times=as_of_times
-            )
+            indices_query = self.get_all_valid_entity_date_combos(state=state)
         else:
             raise ValueError('Unknown matrix type passed: {}'.format(matrix_type))
 
@@ -183,22 +187,15 @@ class BuilderBase(object):
 
         return table_name
 
-    def get_all_valid_entity_date_combos(self, as_of_times):
-        as_of_time_strings = [str(as_of_time) for as_of_time in as_of_times]
+    def get_all_valid_entity_date_combos(self, state):
         query = """
             SELECT entity_id, as_of_date
-            FROM (
-                SELECT DISTINCT entity_id
-                FROM {entities_table}
-            ) AS e
-            CROSS JOIN (
-                SELECT as_of_date
-                FROM (SELECT (UNNEST (ARRAY{times}::timestamp[]))) t(as_of_date)
-            ) AS d
+            FROM {states_table}
+            WHERE {state_string}
             ORDER BY entity_id, as_of_date
         """.format(
-            entities_table=self.db_config['entities_table_name'],
-            times=as_of_time_strings
+            states_table=self.db_config['sparse_state_table_name'],
+            state_string=state
         )
         return(query)
 
@@ -253,6 +250,7 @@ class CSVBuilder(BuilderBase):
             as_of_times,
             label_name,
             label_type,
+            matrix_metadata['state'],
             matrix_type,
             matrix_uuid,
             matrix_metadata['label_window']
@@ -270,6 +268,7 @@ class CSVBuilder(BuilderBase):
                 as_of_times,
                 label_name,
                 label_type,
+                matrix_metadata['state'],
                 matrix_type,
                 entity_date_table_name,
                 matrix_uuid,
@@ -308,6 +307,7 @@ class CSVBuilder(BuilderBase):
         as_of_times,
         label_name,
         label_type,
+        state,
         matrix_type,
         entity_date_table_name,
         matrix_uuid,
@@ -329,16 +329,19 @@ class CSVBuilder(BuilderBase):
                 final_column=', label as {}'.format(label_name),
                 label_name=label_name,
                 label_type=label_type,
+                state=state,
                 label_window=label_window
             )
         elif matrix_type == 'test':
-            labels_query=self.build_outer_join_query(
+            labels_query = self.build_outer_join_query(
                 as_of_times=as_of_times,
                 right_table_name='{schema}.{table}'.format(
                     schema=self.db_config['labels_schema_name'],
                     table=self.db_config['labels_table_name']
                 ),
-                entity_date_table_name='"{}"'.format(entity_date_table_name),
+                entity_date_table_name='"{table}"'.format(
+                    table=entity_date_table_name
+                ),
                 right_column_selections=', r.label as {}'.format(label_name),
                 additional_conditions='''AND
                     r.label_name = '{name}' AND

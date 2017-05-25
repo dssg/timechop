@@ -44,6 +44,7 @@ class BuilderBase(object):
             final_column,
             label_name,
             label_type,
+            state,
             label_window
         ):
         """ Given a table, schema, and list of dates, write a query to get the
@@ -61,23 +62,28 @@ class BuilderBase(object):
         """
         as_of_time_strings = [str(as_of_time) for as_of_time in as_of_times]
         query = """
-            SELECT entity_id,
-                   as_of_date{labels}
-            FROM {labels_schema_name}.{labels_table_name}
-            WHERE as_of_date IN (SELECT (UNNEST (ARRAY{times}::timestamp[]))) AND
+            SELECT l.entity_id,
+                   l.as_of_date{labels}
+            FROM {labels_schema_name}.{labels_table_name} l
+            JOIN {states_table} s
+              ON l.entity_id = s.entity_id
+            WHERE l.as_of_date IN (SELECT (UNNEST (ARRAY{times}::timestamp[]))) AND
                   label_name = '{l_name}' AND
                   label_type = '{l_type}' AND
-                  label_window = '{window}'
-            ORDER BY entity_id,
-                     as_of_date
+                  label_window = '{window}' AND
+                  {state_string}
+            ORDER BY l.entity_id,
+                     l.as_of_date
         """.format(
-            labels = final_column,
-            labels_schema_name = self.db_config['labels_schema_name'],
-            labels_table_name = self.db_config['labels_table_name'],
-            times = as_of_time_strings,
-            l_name = label_name,
-            l_type = label_type,
-            window = label_window
+            labels=final_column,
+            labels_schema_name=self.db_config['labels_schema_name'],
+            labels_table_name=self.db_config['labels_table_name'],
+            states_table=self.db_config['sparse_state_table_name'],
+            state_string=state,
+            times=as_of_time_strings,
+            l_name=label_name,
+            l_type=label_type,
+            window=label_window
         )
         return(query)
 
@@ -138,7 +144,7 @@ class BuilderBase(object):
         as_of_times,
         label_name,
         label_type,
-        feature_table_names,
+        state,
         matrix_type,
         matrix_uuid,
         label_window
@@ -160,23 +166,20 @@ class BuilderBase(object):
                 final_column='',
                 label_name=label_name,
                 label_type=label_type,
+                state=state,
                 label_window=label_window
             )
         elif matrix_type == 'test':
-            indices_query = self.get_all_valid_entity_date_combos(
-                as_of_times=as_of_times,
-                feature_table_names=feature_table_names
-            )
+            indices_query = self.get_all_valid_entity_date_combos(state=state)
         else:
             raise ValueError('Unknown matrix type passed: {}'.format(matrix_type))
 
-        table_name = '_'.join([matrix_uuid, 'tmp_entity_date'])
+        table_name = '_'.join(['tmp_entity_date', matrix_uuid])
         query = """
-            DROP TABLE IF EXISTS {features_schema_name}."{table_name}";
-            CREATE TABLE {features_schema_name}."{table_name}"
+            DROP TABLE IF EXISTS "{table_name}";
+            CREATE TEMPORARY TABLE "{table_name}"
             AS ({index_query})
         """.format(
-            features_schema_name=self.db_config['features_schema_name'],
             table_name=table_name,
             index_query=indices_query
         )
@@ -184,26 +187,17 @@ class BuilderBase(object):
 
         return table_name
 
-    def get_all_valid_entity_date_combos(self, as_of_times, feature_table_names):
-        as_of_time_strings = [str(as_of_time) for as_of_time in as_of_times]     
-        query_list = []       
-        for index, table in enumerate(feature_table_names):
-            union = ''        
-            if index != 0:      
-                union = 'UNION'       
-            subquery = """ {u}        
-                SELECT DISTINCT entity_id, as_of_date     
-                FROM {schema_name}.{table_name}       
-                WHERE as_of_date IN (SELECT (UNNEST (ARRAY{dates}::timestamp[])))       
-            """.format(       
-                u = union,        
-                table_name = table,       
-                dates = as_of_time_strings,      
-                schema_name = self.db_config['features_schema_name']      
-            )     
-            query_list.append(subquery)
-        
-        return(''.join(query_list))
+    def get_all_valid_entity_date_combos(self, state):
+        query = """
+            SELECT entity_id, as_of_date
+            FROM {states_table}
+            WHERE {state_string}
+            ORDER BY entity_id, as_of_date
+        """.format(
+            states_table=self.db_config['sparse_state_table_name'],
+            state_string=state
+        )
+        return(query)
 
 
 class CSVBuilder(BuilderBase):
@@ -256,63 +250,56 @@ class CSVBuilder(BuilderBase):
             as_of_times,
             label_name,
             label_type,
-            feature_dictionary.keys(),
+            matrix_metadata['state'],
             matrix_type,
             matrix_uuid,
             matrix_metadata['label_window']
         )
+        logging.info('Writing feature group data')
+        features_csv_names = self.write_features_data(
+            as_of_times,
+            feature_dictionary,
+            entity_date_table_name,
+            matrix_uuid
+        )
         try:
-            logging.info('Writing feature group data')
-            features_csv_names = self.write_features_data(
+            logging.info('Writing label data')
+            labels_csv_name = self.write_labels_data(
                 as_of_times,
-                feature_dictionary,
+                label_name,
+                label_type,
+                matrix_metadata['state'],
+                matrix_type,
                 entity_date_table_name,
+                matrix_uuid,
+                matrix_metadata['label_window']
+            )
+            features_csv_names.insert(0, labels_csv_name)
+
+            # stitch together the csvs
+            logging.info('Merging features data')
+            output = self.merge_feature_csvs(
+                features_csv_names,
+                matrix_directory,
                 matrix_uuid
             )
-            try:
-                logging.info('Writing label data')
-                labels_csv_name = self.write_labels_data(
-                    as_of_times,
-                    label_name,
-                    label_type,
-                    matrix_type,
-                    entity_date_table_name,
-                    matrix_uuid,
-                    matrix_metadata['label_window']
-                )
-                features_csv_names.insert(0, labels_csv_name)
-
-                # stitch together the csvs
-                logging.info('Merging features data')
-                output = self.merge_feature_csvs(
-                    features_csv_names,
-                    matrix_directory,
-                    matrix_uuid
-                )
-            finally:
-                # clean up files and database before finishing
-                for csv_name in features_csv_names:
-                    self.remove_file(csv_name)
-            try:
-                # store the matrix
-                logging.info('Archiving matrix with metta')
-                metta.archive_matrix(
-                    matrix_config=matrix_metadata,
-                    df_matrix=output,
-                    overwrite=True,
-                    directory=self.matrix_directory,
-                    format='csv'
-                )
-            finally:
-                if isinstance(output, str):
-                    os.remove(output)
         finally:
-            self.engine.execute(
-                'drop table "{}"."{}";'.format(
-                    self.db_config['features_schema_name'],
-                    entity_date_table_name
-                )
+            # clean up files and database before finishing
+            for csv_name in features_csv_names:
+                self.remove_file(csv_name)
+        try:
+            # store the matrix
+            logging.info('Archiving matrix with metta')
+            metta.archive_matrix(
+                matrix_config=matrix_metadata,
+                df_matrix=output,
+                overwrite=True,
+                directory=self.matrix_directory,
+                format='csv'
             )
+        finally:
+            if isinstance(output, str):
+                os.remove(output)
 
 
     def write_labels_data(
@@ -320,6 +307,7 @@ class CSVBuilder(BuilderBase):
         as_of_times,
         label_name,
         label_type,
+        state,
         matrix_type,
         entity_date_table_name,
         matrix_uuid,
@@ -341,17 +329,17 @@ class CSVBuilder(BuilderBase):
                 final_column=', label as {}'.format(label_name),
                 label_name=label_name,
                 label_type=label_type,
+                state=state,
                 label_window=label_window
             )
         elif matrix_type == 'test':
-            labels_query=self.build_outer_join_query(
+            labels_query = self.build_outer_join_query(
                 as_of_times=as_of_times,
                 right_table_name='{schema}.{table}'.format(
                     schema=self.db_config['labels_schema_name'],
                     table=self.db_config['labels_table_name']
                 ),
-                entity_date_table_name='"{schema}"."{table}"'.format(
-                    schema=self.db_config['features_schema_name'],
+                entity_date_table_name='"{table}"'.format(
                     table=entity_date_table_name
                 ),
                 right_column_selections=', r.label as {}'.format(label_name),
@@ -372,7 +360,13 @@ class CSVBuilder(BuilderBase):
         self.write_to_csv(labels_query, csv_name)
         return(csv_name)
 
-    def write_features_data(self, as_of_times, feature_dictionary, entity_date_table_name, matrix_uuid):
+    def write_features_data(
+        self,
+        as_of_times,
+        feature_dictionary,
+        entity_date_table_name,
+        matrix_uuid
+    ):
         """ Loop over tables in features schema, writing the data from each to a
         csv. Return the full list of feature csv names and the list of all
         features.
@@ -394,10 +388,7 @@ class CSVBuilder(BuilderBase):
                     schema = self.db_config['features_schema_name'],
                     table = feature_table_name
                 ),
-                entity_date_table_name = '{schema}."{table}"'.format(
-                    schema = self.db_config['features_schema_name'],
-                    table = entity_date_table_name
-                ),
+                entity_date_table_name = '"{}"'.format(entity_date_table_name),
                 right_column_selections = self._format_imputations(feature_names)
             )
             self.write_to_csv(features_query, csv_name)

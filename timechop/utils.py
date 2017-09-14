@@ -3,12 +3,29 @@ import warnings
 import re
 
 
+def convert_to_list(x):
+    """Given an object, if it is not a list, convert it to a list.
+
+    :param x: an object to be converted to a list
+    :type x: object
+
+    :return: x as a list
+    :rtype: list
+    """
+    if isinstance(x, basestring): x = [x]
+    else:
+        try: iter(x)
+        except TypeError: x = [x]
+        else: x = list(x)
+    return(x)
+
+
 def convert_str_to_relativedelta(delta_string):
     """ Given a string in a postgres interval format (e.g., '1 month'),
     convert it to a dateutil.relativedelta.relativedelta.
 
     Assumptions:
-    - the prediction_window string is in the format 'value unit', where
+    - the string is in the format 'value unit', where
       value is an int and unit is one of year(s), month(s), day(s),
       week(s), hour(s), minute(s), second(s), microsecond(s).
 
@@ -22,24 +39,19 @@ def convert_str_to_relativedelta(delta_string):
     """
     units, value = parse_delta_string(delta_string)
 
-    if units in ['year', 'years', 'y', 'Y']:
+    if units in ['year', 'years']:
         delta = relativedelta(years=value)
     elif units in ['month', 'months']:
         delta = relativedelta(months=value)
-    elif units in ['day', 'days', 'd', 'D']:
+    elif units in ['day', 'days']:
         delta = relativedelta(days=value)
-    elif units in ['week', 'weeks', 'w', 'W']:
+    elif units in ['week', 'weeks']:
         delta = relativedelta(weeks=value)
-    elif units in ['hour', 'hours', 'h', 'H']:
+    elif units in ['hour', 'hours']:
         delta = relativedelta(hours=value)
-    elif units in ['minute', 'minutes', 'm', 'M']:
+    elif units in ['minute', 'minutes']:
         delta = relativedelta(minutes=value)
-        if units in ['m', 'M']:
-            warnings.warn(
-                'Time delta units "{}" converted to minutes.'.format(units),
-                RuntimeWarning
-            )
-    elif units in ['second', 'seconds', 's', 'S']:
+    elif units in ['second', 'seconds']:
         delta = relativedelta(seconds=value)
     elif units == 'microsecond' or units == 'microseconds':
         delta = relativedelta(microseconds=value)
@@ -52,21 +64,68 @@ def convert_str_to_relativedelta(delta_string):
 
 
 def parse_delta_string(delta_string):
+    """ Given a string in a postgres interval format (e.g., '1 month'),
+    parse the units and value from it.
+
+    Assumptions:
+    - the string is in the format 'value unit', where
+      value is an int and unit is one of year(s), month(s), day(s),
+      week(s), hour(s), minute(s), second(s), microsecond(s).
+
+    :param delta_string: the time interval to convert
+    :type delta_string: str
+
+    :return: time units, number of units (value)
+    :rtype: tuple
+
+    :raises: ValueError if the delta_string is not in the expected format
+    """
     if len(delta_string.split(' ')) == 2:
         units = delta_string.split(' ')[1]
         try:
             value = int(delta_string.split(' ')[0])
         except:
-            raise ValueError('''
-                Could not parse value from time delta string: {}
-            '''.format(delta_string))
+            raise ValueError(
+                'Could not parse value from time delta string: {}'.format(
+                    delta_string
+                )
+            )
     else:
         delta_parts = re.split('([a-zA-Z]*)', delta_string)
-        units = delta_parts[1]
+        try:
+            units = delta_parts[1]
+        except:
+            raise ValueError(
+                'No units in time delta string {}'.format(delta_string)
+            )
         try:
             value = int(delta_parts[0])
         except:
-            raise ValueError('''
-                Could not parse value from time delta string: {}
-            '''.format(delta_string))
+            raise ValueError(
+                'Could not parse value from time delta string: {}'.format(
+                    delta_string
+                )
+            )
     return(units, value)
+
+
+def get_one_unit_delta(delta_string):
+    """ Given a string in a postgres interval format (e.g., '3 months'),
+    return a time delta of just one of whatever unit the interval is
+    (e.g., 1 month)
+
+    Assumptions:
+    - the string is in the format 'value unit', where
+      value is an int and unit is one of year(s), month(s), day(s),
+      week(s), hour(s), minute(s), second(s), microsecond(s).
+
+    :param delta_string: the time interval to convert
+    :type delta_string: str
+
+    :return: a one unit relativedelta
+    :rtype: dateutil.relativedelta.relativedelta
+
+    :raises: ValueError if the delta_string is not in the expected format
+    """
+    delta_unit = parse_delta_string(delta_string)[0]
+    return(convert_str_to_relativedelta('1 {}'.format(delta_unit)))

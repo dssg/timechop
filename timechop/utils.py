@@ -1,6 +1,7 @@
 from dateutil.relativedelta import relativedelta
 import warnings
 import re
+from six import string_types
 
 
 def convert_to_list(x):
@@ -12,7 +13,7 @@ def convert_to_list(x):
     :return: x as a list
     :rtype: list
     """
-    if isinstance(x, basestring): x = [x]
+    if isinstance(x, string_types): x = [x]
     else:
         try: iter(x)
         except TypeError: x = [x]

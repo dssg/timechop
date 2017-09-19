@@ -343,6 +343,59 @@ class test_chop_time(TestCase):
         result = chopper.chop_time()
         assert(result == expected_result)
 
+    def test_training_prediction_span_longer_than_1_day(self):
+        expected_result = [
+            {
+                'feature_start_time': datetime.datetime(1990, 1, 1, 0, 0),
+                'label_start_time': datetime.datetime(2010, 1, 1, 0, 0),
+                'feature_end_time': datetime.datetime(2010, 1, 19, 0, 0),
+                'label_end_time': datetime.datetime(2010, 1, 19, 0, 0),
+                'train_matrix': {
+                    'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'as_of_times': [
+                        datetime.datetime(2010, 1, 1, 0, 0),
+                        datetime.datetime(2010, 1, 2, 0, 0),
+                        datetime.datetime(2010, 1, 3, 0, 0),
+                        datetime.datetime(2010, 1, 4, 0, 0),
+                        datetime.datetime(2010, 1, 5, 0, 0)
+                    ],
+                    'training_prediction_span': '5 days',
+                    'training_data_frequency': '1 days',
+                    'max_training_history': '5 days'
+                },
+                'test_matrices': [{
+                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
+                    'as_of_times': [
+                        datetime.datetime(2010, 1, 10, 0, 0),
+                        datetime.datetime(2010, 1, 11, 0, 0),
+                        datetime.datetime(2010, 1, 12, 0, 0),
+                        datetime.datetime(2010, 1, 13, 0, 0),
+                        datetime.datetime(2010, 1, 14, 0, 0)
+                    ],
+                    'test_prediction_span': '5 days',
+                    'test_data_frequency': '1 days',
+                    'test_span': '5 days'
+                }]
+            }
+        ]
+        chopper = Timechop(
+            feature_start_time=datetime.datetime(1990, 1, 1, 0, 0),
+            feature_end_time=datetime.datetime(2010, 1, 19, 0, 0),
+            label_start_time=datetime.datetime(2010, 1, 1, 0, 0),
+            label_end_time=datetime.datetime(2010, 1, 19, 0, 0),
+            model_update_frequency='5 days',
+            training_data_frequencies=['1 days'],
+            test_data_frequencies=['1 days'],
+            max_training_histories=['5 days'],
+            test_spans=['5 days'],
+            test_prediction_spans=['5 days'],
+            training_prediction_spans=['5 days']
+        )
+        result = chopper.chop_time()
+        assert(result == expected_result)
+
     def test_unevenly_divisible_lookback_duration(self):
         expected_result = [
             {

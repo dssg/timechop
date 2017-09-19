@@ -319,7 +319,10 @@ class Timechop(object):
         # create a dict of the matrix metadata
         matrix_definition = {
             'matrix_start_time': earliest_possible_train_as_of_time,
-            'matrix_end_time': train_test_split_time,
+            'matrix_end_time': (
+                train_test_split_time - training_prediction_delta
+                + utils.get_one_unit_delta(training_prediction_span)
+            ),
             'as_of_times': train_as_of_times,
             'training_prediction_span': training_prediction_span,
             'training_data_frequency': training_data_frequency,

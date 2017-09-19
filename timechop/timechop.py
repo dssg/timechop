@@ -151,6 +151,7 @@ class Timechop(object):
 
         return(train_test_split_times)
 
+    # matrix_end_time is now matrix_end_time - label_window
     def calculate_as_of_times(
         self,
         matrix_start_time,
@@ -176,6 +177,7 @@ class Timechop(object):
             matrix_end_time,
             data_frequency
         )
+
         as_of_times = []
 
         if forward:

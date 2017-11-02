@@ -154,7 +154,7 @@ class Timechop(object):
     # matrix_end_time is now matrix_end_time - label_window
     def calculate_as_of_times(
         self,
-        matrix_start_time,
+        matrix_start_time, # change names
         matrix_end_time,
         data_frequency,
         forward=False
@@ -320,12 +320,13 @@ class Timechop(object):
 
         # create a dict of the matrix metadata
         matrix_definition = {
-            'matrix_start_time': earliest_possible_train_as_of_time,
-            'matrix_end_time': (
+            'matrix_start_time': earliest_possible_train_as_of_time, #rename to 'earliest as of time'?
+            'matrix_end_time': ( # make this just split time, rename to 'information cutoff time'?
                 train_test_split_time - training_prediction_delta
                 + utils.get_one_unit_delta(training_prediction_span)
             ),
             'as_of_times': train_as_of_times,
+            # last as of time as new matrix definition parameter
             'training_prediction_span': training_prediction_span,
             'training_data_frequency': training_data_frequency,
             'max_training_history': max_training_history

@@ -20,12 +20,12 @@ Timechop currently works with the following:
 - label_start_time - data aggregated into labels begins at this point
 - label_end_time - data aggregated is from *before* this point
 - model_update_frequency - amount of time between train/test splits
-- training_data_frequencies - how much time between rows for a single entity in a training matrix
+- training_as_of_date_frequencies - how much time between rows for a single entity in a training matrix
 - max_training_histories - the maximum amount of history for each entity to train on (early matrices may contain less than this time if it goes past label/feature start times)
-- training_prediction_spans - how much time is covered by training labels (e.g., outcomes in the next 1 year? 3 days? 2 months?)
-- test_data_frequencies - how much time between rows for a single entity in a test matrix
-- test_spans - how far into the future should a model be used to make predictions
-- test_prediction_spans - how much time is covered by test predictions (e.g., outcomes in the next 1 year? 3 days? 2 months?)
+- training_label_timespans - how much time is covered by training labels (e.g., outcomes in the next 1 year? 3 days? 2 months?)
+- test_as_of_date_frequencies - how much time between rows for a single entity in a test matrix
+- test_durations - how far into the future should a model be used to make predictions
+- test_label_timespans - how much time is covered by test predictions (e.g., outcomes in the next 1 year? 3 days? 2 months?)
 
 Here's an example:
 
@@ -38,12 +38,12 @@ chopper = Timechop(
     label_start_time=datetime.datetime(2010, 1, 1, 0, 0),
     label_end_time=datetime.datetime(2010, 1, 16, 0, 0),
     model_update_frequency='5 days',
-    training_data_frequencies=['1 days'],
+    training_as_of_date_frequencies=['1 days'],
     max_training_histories=['5 days'],
-    training_prediction_spans=['1 day'],
-    test_data_frequencies=['3 days'],
-    test_spans=['5 days'],
-    test_prediction_spans=['3 days']
+    training_label_timespans=['1 day'],
+    test_as_of_date_frequencies=['3 days'],
+    test_durations=['5 days'],
+    test_label_timespans=['3 days']
 )
 result = chopper.chop_time()
 print(result)

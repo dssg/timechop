@@ -109,24 +109,3 @@ def parse_delta_string(delta_string):
             )
     return(units, value)
 
-
-def get_one_unit_delta(delta_string):
-    """ Given a string in a postgres interval format (e.g., '3 months'),
-    return a time delta of just one of whatever unit the interval is
-    (e.g., 1 month)
-
-    Assumptions:
-    - the string is in the format 'value unit', where
-      value is an int and unit is one of year(s), month(s), day(s),
-      week(s), hour(s), minute(s), second(s), microsecond(s).
-
-    :param delta_string: the time interval to convert
-    :type delta_string: str
-
-    :return: a one unit relativedelta
-    :rtype: dateutil.relativedelta.relativedelta
-
-    :raises: ValueError if the delta_string is not in the expected format
-    """
-    delta_unit = parse_delta_string(delta_string)[0]
-    return(convert_str_to_relativedelta('1 {}'.format(delta_unit)))

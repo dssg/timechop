@@ -132,9 +132,8 @@ class Timechop(object):
 
         # last split is the first as of time in the final test matrix
         test_delta = utils.convert_str_to_relativedelta(test_span)
-        test_span_unit_delta = utils.get_one_unit_delta(test_span)
         last_split_time = (
-            last_test_label_time - test_delta + test_span_unit_delta
+            last_test_label_time - test_delta
         )
         logging.info('Final split time: {}'.format(last_split_time))
         if last_split_time < earliest_possible_split_time:
@@ -293,9 +292,8 @@ class Timechop(object):
         max_training_delta = utils.convert_str_to_relativedelta(
             max_training_history
         )
-        max_training_unit_delta = utils.get_one_unit_delta(max_training_history)
         earliest_possible_train_as_of_time = (
-            last_train_as_of_time - max_training_delta + max_training_unit_delta
+            last_train_as_of_time - max_training_delta
         )
         experiment_as_of_time_limit = max(
             self.label_start_time,
@@ -323,7 +321,6 @@ class Timechop(object):
             'matrix_start_time': earliest_possible_train_as_of_time, #rename to 'earliest as of time'?
             'matrix_end_time': ( # make this just split time, rename to 'information cutoff time'?
                 train_test_split_time - training_prediction_delta
-                + utils.get_one_unit_delta(training_prediction_span)
             ),
             'as_of_times': train_as_of_times,
             # last as of time as new matrix definition parameter

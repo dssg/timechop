@@ -86,9 +86,9 @@ class Timechop(object):
                 )
             )
             train_test_split_times = self.calculate_train_test_split_times(
-                utils.convert_str_to_relativedelta(training_prediction_span),
-                utils.convert_str_to_relativedelta(test_prediction_span),
-                test_span
+                training_prediction_span=utils.convert_str_to_relativedelta(training_prediction_span),
+                test_prediction_span=utils.convert_str_to_relativedelta(test_prediction_span),
+                test_span=test_span
             )
             logging.info('Train/test split times: {}'.format(train_test_split_times))
 
@@ -312,10 +312,10 @@ class Timechop(object):
         # buffer between the last as_of_time and the train-test split time for the last
         # set of labels (see comments in the method for details)
         train_matrix_definition = self.define_train_matrix(
-            train_test_split_time,
-            training_prediction_span,
-            max_training_history,
-            training_data_frequency
+            train_test_split_time=train_test_split_time,
+            training_prediction_span=training_prediction_span,
+            max_training_history=max_training_history,
+            training_data_frequency=training_data_frequency
         )
 
         # for the example, the test matrix will contain three as_of_dates:
@@ -324,9 +324,9 @@ class Timechop(object):
         # the test_data_frequency (1 month) until we've exhausted the test_span
         # (3 months), exclusive (see comments in the method for details)
         test_matrix_definitions = self.define_test_matrices(
-            train_test_split_time,
-            test_span,
-            test_prediction_span
+            train_test_split_time=train_test_split_time,
+            test_span=test_span,
+            test_prediction_span=test_prediction_span
         )
             
         matrix_set_definition = {
@@ -423,9 +423,9 @@ class Timechop(object):
         # for our example, this will give us a list of every day from 2014-04-01
         # through 2016-04-01, including _both_ endpoints
         train_as_of_times = self.calculate_as_of_times(
-            earliest_possible_train_as_of_time,
-            last_train_as_of_time,
-            utils.convert_str_to_relativedelta(training_data_frequency)
+            matrix_start_time=earliest_possible_train_as_of_time,
+            matrix_end_time=last_train_as_of_time,
+            data_frequency=utils.convert_str_to_relativedelta(training_data_frequency)
         )
         logging.info('train as of times: {}'.format(train_as_of_times))
 
@@ -507,10 +507,10 @@ class Timechop(object):
             # the test_data_frequency (1 month) until we've exhausted the test_span
             # (3 months), exclusive (see comments in the method for details)
             test_as_of_times = self.calculate_as_of_times(
-                train_test_split_time,
-                as_of_time_limit,
-                utils.convert_str_to_relativedelta(test_data_frequency),
-                True
+                matrix_start_time=train_test_split_time,
+                matrix_end_time=as_of_time_limit,
+                data_frequency=utils.convert_str_to_relativedelta(test_data_frequency),
+                forward=True
             )
             logging.info('Test as of times: {}'.format(test_as_of_times))
             test_definition = {

@@ -118,7 +118,7 @@ class Timechop(object):
         # final label must be able to have feature data associated with it
         if last_test_label_time > self.feature_end_time:
             last_test_label_time = self.feature_end_time
-            warnings.warn('Final test label date is after end of feature time. Moving labels back to end of feature time.')
+            raise ValueError('Final test label date cannot be after end of feature time.')
         logging.info('Final label as of date: {}'.format(last_test_label_time))
 
         # all split times have to allow at least one training label before them

@@ -10,10 +10,38 @@ logging.basicConfig(level=logging.DEBUG)
 class test_calculate_train_test_split_times(TestCase):
     def test_valid_input(self):
         expected_result = [
-            datetime.datetime(2015, 2, 1, 0, 0),
-            datetime.datetime(2015, 5, 1, 0, 0),
-            datetime.datetime(2015, 8, 1, 0, 0)
+            datetime.datetime(2015, 3, 1, 0, 0),
+            datetime.datetime(2015, 6, 1, 0, 0),
+            datetime.datetime(2015, 9, 1, 0, 0),
+            datetime.datetime(2015, 12, 1, 0, 0),
+            datetime.datetime(2016, 3, 1, 0, 0),
+            datetime.datetime(2016, 6, 1, 0, 0)
         ]
+        chopper = Timechop(
+            feature_start_time=datetime.datetime(2010, 1, 1, 0, 0),
+            feature_end_time=datetime.datetime(2017, 1, 1, 0, 0),
+            label_start_time=datetime.datetime(2015, 1, 1, 0, 0),
+            label_end_time=datetime.datetime(2017, 1, 1, 0, 0),
+            model_update_frequency='3 months',
+            training_data_frequencies=['1 day'],
+            test_data_frequencies=['1 day'],
+            max_training_histories=['1 year'],
+            test_spans=['6 months'],
+            test_prediction_spans=['1 months'],
+            training_prediction_spans=['3 days']
+        )
+        
+        # this should throw an exception because last possible label date is after
+        # end of feature time
+        result = chopper.calculate_train_test_split_times(
+            training_prediction_span=convert_str_to_relativedelta('3 days'),
+            test_span='6 months',
+            test_prediction_span=convert_str_to_relativedelta('1 month')
+        )
+
+        assert result == expected_result
+
+    def test_labels_after_features(self):
         chopper = Timechop(
             feature_start_time=datetime.datetime(2010, 1, 1, 0, 0),
             feature_end_time=datetime.datetime(2016, 1, 1, 0, 0),
@@ -28,21 +56,16 @@ class test_calculate_train_test_split_times(TestCase):
             training_prediction_spans=['3 days']
         )
         
-        # this should throw a warning because last possible label date is after
+        # this should throw an exception because last possible label date is after
         # end of feature time
-        with warnings.catch_warnings(record = True) as w:
-            warnings.simplefilter("always")
+        with self.assertRaises(ValueError):
             result = chopper.calculate_train_test_split_times(
                 training_prediction_span=convert_str_to_relativedelta('3 days'),
                 test_span='6 months',
                 test_prediction_span=convert_str_to_relativedelta('1 month')
             )
-            assert len(w) == 1
-            assert "Final" in str(w[-1].message)
 
-        assert result == expected_result
-
-    def test_invalid_input(self):
+    def test_no_valid_label_dates(self):
         chopper = Timechop(
             feature_start_time=datetime.datetime(2010, 1, 1, 0, 0),
             feature_end_time=datetime.datetime(2016, 1, 1, 0, 0),
@@ -140,7 +163,7 @@ class test_generate_matrix_definitions(TestCase):
             'label_end_time': datetime.datetime(2010, 1, 11, 0, 0),
             'train_matrix': {
                 'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                'matrix_end_time': datetime.datetime(2010, 1, 6, 0, 0),
+                'matrix_end_time': datetime.datetime(2010, 1, 5, 0, 0),
                 'as_of_times': [
                     datetime.datetime(2010, 1, 1, 0, 0),
                     datetime.datetime(2010, 1, 2, 0, 0),
@@ -195,7 +218,7 @@ class test_generate_matrix_definitions(TestCase):
             'label_end_time': datetime.datetime(2010, 1, 11, 0, 0),
             'train_matrix': {
                 'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                'matrix_end_time': datetime.datetime(2010, 1, 6, 0, 0),
+                'matrix_end_time': datetime.datetime(2010, 1, 5, 0, 0),
                 'as_of_times': [
                     datetime.datetime(2010, 1, 1, 0, 0),
                     datetime.datetime(2010, 1, 2, 0, 0),
@@ -265,27 +288,26 @@ class test_chop_time(TestCase):
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
                     'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 1, 0, 0),
                         datetime.datetime(2010, 1, 2, 0, 0),
                         datetime.datetime(2010, 1, 3, 0, 0),
-                        datetime.datetime(2010, 1, 4, 0, 0),
-                        datetime.datetime(2010, 1, 5, 0, 0)
+                        datetime.datetime(2010, 1, 4, 0, 0)
                     ],
                     'training_prediction_span': '1 day',
                     'training_data_frequency': '1 days',
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 5, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
                         datetime.datetime(2010, 1, 7, 0, 0),
                         datetime.datetime(2010, 1, 8, 0, 0),
-                        datetime.datetime(2010, 1, 9, 0, 0),
-                        datetime.datetime(2010, 1, 10, 0, 0)
+                        datetime.datetime(2010, 1, 9, 0, 0)
                     ],
                     'test_prediction_span': '1 day',
                     'test_data_frequency': '1 days',
@@ -298,28 +320,29 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 9, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 4, 0, 0),
+                        datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
                         datetime.datetime(2010, 1, 7, 0, 0),
                         datetime.datetime(2010, 1, 8, 0, 0),
-                        datetime.datetime(2010, 1, 9, 0, 0),
-                        datetime.datetime(2010, 1, 10, 0, 0)
+                        datetime.datetime(2010, 1, 9, 0, 0)
                     ],
                     'training_prediction_span': '1 day',
                     'training_data_frequency': '1 days',
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 11, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 16, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 10, 0, 0),
                         datetime.datetime(2010, 1, 11, 0, 0),
                         datetime.datetime(2010, 1, 12, 0, 0),
                         datetime.datetime(2010, 1, 13, 0, 0),
-                        datetime.datetime(2010, 1, 14, 0, 0),
-                        datetime.datetime(2010, 1, 15, 0, 0)
+                        datetime.datetime(2010, 1, 14, 0, 0)
                     ],
                     'test_prediction_span': '1 day',
                     'test_data_frequency': '1 days',
@@ -352,27 +375,26 @@ class test_chop_time(TestCase):
                 'label_end_time': datetime.datetime(2010, 1, 19, 0, 0),
                 'train_matrix': {
                     'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 1, 0, 0),
                         datetime.datetime(2010, 1, 2, 0, 0),
                         datetime.datetime(2010, 1, 3, 0, 0),
-                        datetime.datetime(2010, 1, 4, 0, 0),
-                        datetime.datetime(2010, 1, 5, 0, 0)
+                        datetime.datetime(2010, 1, 4, 0, 0)
                     ],
                     'training_prediction_span': '5 days',
                     'training_data_frequency': '1 days',
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 14, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 9, 0, 0),
                         datetime.datetime(2010, 1, 10, 0, 0),
                         datetime.datetime(2010, 1, 11, 0, 0),
                         datetime.datetime(2010, 1, 12, 0, 0),
-                        datetime.datetime(2010, 1, 13, 0, 0),
-                        datetime.datetime(2010, 1, 14, 0, 0)
+                        datetime.datetime(2010, 1, 13, 0, 0)
                     ],
                     'test_prediction_span': '5 days',
                     'test_data_frequency': '1 days',
@@ -405,27 +427,26 @@ class test_chop_time(TestCase):
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
                     'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 1, 0, 0),
                         datetime.datetime(2010, 1, 2, 0, 0),
                         datetime.datetime(2010, 1, 3, 0, 0),
-                        datetime.datetime(2010, 1, 4, 0, 0),
-                        datetime.datetime(2010, 1, 5, 0, 0)
+                        datetime.datetime(2010, 1, 4, 0, 0)
                     ],
                     'training_prediction_span': '1 day',
                     'training_data_frequency': '1 days',
                     'max_training_history': '7 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 5, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
                         datetime.datetime(2010, 1, 7, 0, 0),
                         datetime.datetime(2010, 1, 8, 0, 0),
-                        datetime.datetime(2010, 1, 9, 0, 0),
-                        datetime.datetime(2010, 1, 10, 0, 0)
+                        datetime.datetime(2010, 1, 9, 0, 0)
                     ],
                     'test_prediction_span': '1 day',
                     'test_data_frequency': '1 days',
@@ -438,30 +459,31 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 4, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 2, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 9, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 2, 0, 0),
+                        datetime.datetime(2010, 1, 3, 0, 0),
                         datetime.datetime(2010, 1, 4, 0, 0),
                         datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
                         datetime.datetime(2010, 1, 7, 0, 0),
                         datetime.datetime(2010, 1, 8, 0, 0),
-                        datetime.datetime(2010, 1, 9, 0, 0),
-                        datetime.datetime(2010, 1, 10, 0, 0)
+                        datetime.datetime(2010, 1, 9, 0, 0)
                     ],
                     'training_prediction_span': '1 day',
                     'training_data_frequency': '1 days',
                     'max_training_history': '7 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 11, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 16, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 10, 0, 0),
                         datetime.datetime(2010, 1, 11, 0, 0),
                         datetime.datetime(2010, 1, 12, 0, 0),
                         datetime.datetime(2010, 1, 13, 0, 0),
-                        datetime.datetime(2010, 1, 14, 0, 0),
-                        datetime.datetime(2010, 1, 15, 0, 0)
+                        datetime.datetime(2010, 1, 14, 0, 0)
                     ],
                     'test_prediction_span': '1 day',
                     'test_data_frequency': '1 days',
@@ -494,25 +516,24 @@ class test_chop_time(TestCase):
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
                     'matrix_start_time': datetime.datetime(2010, 1, 3, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 3, 0, 0),
-                        datetime.datetime(2010, 1, 4, 0, 0),
-                        datetime.datetime(2010, 1, 5, 0, 0)
+                        datetime.datetime(2010, 1, 4, 0, 0)
                     ],
                     'training_prediction_span': '1 day',
                     'training_data_frequency': '1 days',
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 5, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
                         datetime.datetime(2010, 1, 7, 0, 0),
                         datetime.datetime(2010, 1, 8, 0, 0),
-                        datetime.datetime(2010, 1, 9, 0, 0),
-                        datetime.datetime(2010, 1, 10, 0, 0)
+                        datetime.datetime(2010, 1, 9, 0, 0)
                     ],
                     'test_prediction_span': '1 day',
                     'test_data_frequency': '1 days',
@@ -525,28 +546,29 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 9, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 4, 0, 0),
+                        datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
                         datetime.datetime(2010, 1, 7, 0, 0),
                         datetime.datetime(2010, 1, 8, 0, 0),
-                        datetime.datetime(2010, 1, 9, 0, 0),
-                        datetime.datetime(2010, 1, 10, 0, 0)
+                        datetime.datetime(2010, 1, 9, 0, 0)
                     ],
                     'training_prediction_span': '1 day',
                     'training_data_frequency': '1 days',
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 11, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 16, 0, 0),
+                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
                     'as_of_times': [
+                        datetime.datetime(2010, 1, 10, 0, 0),
                         datetime.datetime(2010, 1, 11, 0, 0),
                         datetime.datetime(2010, 1, 12, 0, 0),
                         datetime.datetime(2010, 1, 13, 0, 0),
-                        datetime.datetime(2010, 1, 14, 0, 0),
-                        datetime.datetime(2010, 1, 15, 0, 0)
+                        datetime.datetime(2010, 1, 14, 0, 0)
                     ],
                     'test_prediction_span': '1 day',
                     'test_data_frequency': '1 days',

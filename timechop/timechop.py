@@ -181,6 +181,12 @@ class Timechop(object):
 
         if forward:
             as_of_time = matrix_start_time
+            # essentially a do-while loop for test matrices since
+            # identical start and end times should include the first
+            # date (e.g., ['2017-01-01', '2017-01-01') should give
+            # preference to the inclusive side)
+            as_of_times.append(as_of_time)
+            as_of_time += data_frequency
             while as_of_time < matrix_end_time:
                 as_of_times.append(as_of_time)
                 as_of_time += data_frequency

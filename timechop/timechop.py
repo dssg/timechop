@@ -208,16 +208,16 @@ class Timechop(object):
     # matrix_end_time is now matrix_end_time - label_window
     def calculate_as_of_times(
         self,
-        matrix_start_time, # change names
-        matrix_end_time,
+        as_of_start_limit,
+        as_of_end_limit,
         data_frequency,
         forward=False
     ):
         """ Given a start and stop time, a frequncy, and a direction, calculate the
         as of times for a matrix.
 
-        :param matrix_start_time: the earliest possible as of time for a matrix
-        :param matrix_end_time: the last possible as of time for the matrix
+        :param as_of_start_limit: the earliest possible as of time for a matrix
+        :param as_of_end_limit: the last possible as of time for the matrix
         :param data_frequency: how much time between rows for a single entity
         :param forward: whether to generate times forward from the start time 
                         (True) or backward from the end time (False)
@@ -227,41 +227,41 @@ class Timechop(object):
         """
         logging.info(
             'Calculating as_of_times from %s to %s using example frequency %s',
-            matrix_start_time,
-            matrix_end_time,
+            as_of_start_limit,
+            as_of_end_limit,
             data_frequency
         )
 
         as_of_times = []
 
         # in our example, this will apply to the test matrix with parameters
-        #   matrix_start_time = 2016-10-01, matrix_end_time = 2017-01-01,
+        #   as_of_start_limit = 2016-10-01, as_of_end_limit = 2017-01-01,
         #   data_frequency = 1month, forward=True
         # so, we'll start at 2016-10-01 and append this to the list of
         # as_of_times, then step forward one month at a time until we hit (but
         # do not include) 2017-01-01, yielding three values:
         #   [2016-10-01, 2016-11-01, 2016-12-01]
         if forward:
-            as_of_time = matrix_start_time
+            as_of_time = as_of_start_limit
             # essentially a do-while loop for test matrices since
             # identical start and end times should include the first
             # date (e.g., ['2017-01-01', '2017-01-01') should give
             # preference to the inclusive side)
             as_of_times.append(as_of_time)
             as_of_time += data_frequency
-            while as_of_time < matrix_end_time:
+            while as_of_time < as_of_end_limit:
                 as_of_times.append(as_of_time)
                 as_of_time += data_frequency
 
         # in our example, this will apply to the training matrix with parameters
-        #   matrix_start_time = 2014-04-01, matrix_end_time = 2016-04-01,
+        #   as_of_start_limit = 2014-04-01, as_of_end_limit = 2016-04-01,
         #   data_frequency = 1day, forward=False
         # so, we'll start from 2016-04-01 and step back by one day at a time
         # appending the results to the list of as_of_times until we hit 2014-04-01
         # (which will also be included)
         else:
-            as_of_time = matrix_end_time
-            while as_of_time >= matrix_start_time:
+            as_of_time = as_of_end_limit
+            while as_of_time >= as_of_start_limit:
                 as_of_times.insert(0, as_of_time)
                 as_of_time -= data_frequency
 
@@ -423,8 +423,8 @@ class Timechop(object):
         # for our example, this will give us a list of every day from 2014-04-01
         # through 2016-04-01, including _both_ endpoints
         train_as_of_times = self.calculate_as_of_times(
-            matrix_start_time=earliest_possible_train_as_of_time,
-            matrix_end_time=last_train_as_of_time,
+            as_of_start_limit=earliest_possible_train_as_of_time,
+            as_of_end_limit=last_train_as_of_time,
             data_frequency=utils.convert_str_to_relativedelta(training_data_frequency)
         )
         logging.info('train as of times: {}'.format(train_as_of_times))
@@ -507,8 +507,8 @@ class Timechop(object):
             # the test_data_frequency (1 month) until we've exhausted the test_span
             # (3 months), exclusive (see comments in the method for details)
             test_as_of_times = self.calculate_as_of_times(
-                matrix_start_time=train_test_split_time,
-                matrix_end_time=as_of_time_limit,
+                as_of_start_limit=train_test_split_time,
+                as_of_end_limit=as_of_time_limit,
                 data_frequency=utils.convert_str_to_relativedelta(test_data_frequency),
                 forward=True
             )

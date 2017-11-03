@@ -118,8 +118,8 @@ def test_calculate_as_of_times_one_day_freq():
         training_prediction_spans=['3 months']
     )
     result = chopper.calculate_as_of_times(
-        matrix_start_time = datetime.datetime(2011, 1, 1, 0, 0),
-        matrix_end_time = datetime.datetime(2011, 1, 11, 0, 0),
+        as_of_start_limit = datetime.datetime(2011, 1, 1, 0, 0),
+        as_of_end_limit = datetime.datetime(2011, 1, 11, 0, 0),
         data_frequency = convert_str_to_relativedelta('1 days')
     )
     assert(result == expected_result)
@@ -146,8 +146,8 @@ def test_calculate_as_of_times_three_day_freq():
         training_prediction_spans=['3 months']
     )
     result = chopper.calculate_as_of_times(
-        matrix_start_time = datetime.datetime(2011, 1, 1, 0, 0),
-        matrix_end_time = datetime.datetime(2011, 1, 11, 0, 0),
+        as_of_start_limit = datetime.datetime(2011, 1, 1, 0, 0),
+        as_of_end_limit = datetime.datetime(2011, 1, 11, 0, 0),
         data_frequency = convert_str_to_relativedelta('3 days'),
         forward=True
     )

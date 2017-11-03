@@ -24,7 +24,7 @@ Timechop currently works with the following:
 - max_training_histories - the maximum amount of history for each entity to train on (early matrices may contain less than this time if it goes past label/feature start times)
 - training_label_timespans - how much time is covered by training labels (e.g., outcomes in the next 1 year? 3 days? 2 months?)
 - test_as_of_date_frequencies - how much time between rows for a single entity in a test matrix
-- test_durations - how far into the future should a model be used to make predictions
+- test_durations - how far into the future should a model be used to make predictions (in the typical case of wanting a single prediction set immediately after model training, this should be set to 0 days)
 - test_label_timespans - how much time is covered by test predictions (e.g., outcomes in the next 1 year? 3 days? 2 months?)
 
 Here's an example:

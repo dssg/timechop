@@ -113,12 +113,12 @@ class Timechop(object):
                     )
                     matrix_set_definitions.append(
                         self.generate_matrix_definitions(
-                            train_test_split_time,
-                            training_data_frequency,
-                            max_training_history,
-                            test_span,
-                            test_prediction_span,
-                            training_prediction_span
+                            train_test_split_time=train_test_split_time,
+                            training_data_frequency=training_data_frequency,
+                            max_training_history=max_training_history,
+                            test_span=test_span,
+                            training_prediction_span=training_prediction_span,
+                            test_prediction_span=test_prediction_span
                         )
                     )
         return(matrix_set_definitions)

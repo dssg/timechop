@@ -1,7 +1,6 @@
 from timechop.utils import convert_str_to_relativedelta
 from timechop.utils import parse_delta_string
 from timechop.utils import convert_to_list
-from timechop.utils import get_one_unit_delta
 import datetime
 import unittest
 import warnings
@@ -69,12 +68,6 @@ class test_convert_str_to_relativedelta(unittest.TestCase):
         for bad_delta_string in bad_delta_strings:
             with self.assertRaises(ValueError):
                 convert_str_to_relativedelta(bad_delta_string)
-
-
-def test_get_one_unit_delta():
-    start_date = datetime.datetime(2016, 4, 30)
-    expected_result = datetime.datetime(2016, 5, 1)
-    assert start_date + get_one_unit_delta('9 days') == expected_result
 
 
 def test_convert_to_list():

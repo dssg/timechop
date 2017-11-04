@@ -60,9 +60,9 @@ print(result)
             ],
             'matrix_end_time': datetime.datetime(2014, 7, 1, 0, 0),
             'matrix_start_time': datetime.datetime(2014, 7, 1, 0, 0),
-            'test_data_frequency': '1 days',
-            'test_prediction_span': '6 months',
-            'test_span': '0 days'
+            'test_as_of_date_frequency': '1 days',
+            'test_label_timespan': '6 months',
+            'test_duration': '0 days'
         }],
         'train_matrix': {
             'as_of_times': [
@@ -71,8 +71,8 @@ print(result)
             'matrix_end_time': datetime.datetime(2014, 1, 1, 0, 0),
             'matrix_start_time': datetime.datetime(2014, 1, 1, 0, 0),
             'max_training_history': '2 years',
-            'training_data_frequency': '6 months',
-            'training_prediction_span': '6 months'
+            'training_as_of_date_frequency': '6 months',
+            'training_label_timespan': '6 months'
         }
     },
     {
@@ -86,9 +86,9 @@ print(result)
             ],
             'matrix_end_time': datetime.datetime(2015, 7, 1, 0, 0),
             'matrix_start_time': datetime.datetime(2015, 7, 1, 0, 0),
-            'test_data_frequency': '1 days',
-            'test_prediction_span': '6 months',
-            'test_span': '0 days'
+            'test_as_of_date_frequency': '1 days',
+            'test_label_timespan': '6 months',
+            'test_duration': '0 days'
         }],
         'train_matrix': {
             'as_of_times': [
@@ -99,8 +99,8 @@ print(result)
             'matrix_end_time': datetime.datetime(2015, 1, 1, 0, 0),
             'matrix_start_time': datetime.datetime(2014, 1, 1, 0, 0),
             'max_training_history': '2 years',
-            'training_data_frequency': '6 months',
-            'training_prediction_span': '6 months'
+            'training_as_of_date_frequency': '6 months',
+            'training_label_timespan': '6 months'
         }
     },
     {
@@ -114,9 +114,9 @@ print(result)
             ],
             'matrix_end_time': datetime.datetime(2016, 7, 1, 0, 0),
             'matrix_start_time': datetime.datetime(2016, 7, 1, 0, 0),
-            'test_data_frequency': '1 days',
-            'test_prediction_span': '6 months',
-            'test_span': '0 days'
+            'test_as_of_date_frequency': '1 days',
+            'test_label_timespan': '6 months',
+            'test_duration': '0 days'
         }],
         'train_matrix': {
             'as_of_times': [
@@ -129,8 +129,8 @@ print(result)
             'matrix_end_time': datetime.datetime(2016, 1, 1, 0, 0),
             'matrix_start_time': datetime.datetime(2014, 1, 1, 0, 0),
             'max_training_history': '2 years',
-            'training_data_frequency': '6 months',
-            'training_prediction_span': '6 months'
+            'training_as_of_date_frequency': '6 months',
+            'training_label_timespan': '6 months'
         }
     }
 ]
@@ -173,9 +173,9 @@ print(result)
             ],
             'matrix_end_time': datetime.datetime(2010, 1, 8, 0, 0),
             'matrix_start_time': datetime.datetime(2010, 1, 3, 0, 0),
-            'test_data_frequency': '3 days',
-            'test_prediction_span': '3 days',
-            'test_span': '5 days'
+            'test_as_of_date_frequency': '3 days',
+            'test_label_timespan': '3 days',
+            'test_duration': '5 days'
         }],
         'train_matrix': {
             'as_of_times': [
@@ -185,8 +185,8 @@ print(result)
             'matrix_end_time': datetime.datetime(2010, 1, 2, 0, 0),
             'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
             'max_training_history': '5 days',
-            'training_data_frequency': '1 days',
-            'training_prediction_span': '1 day'
+            'training_as_of_date_frequency': '1 days',
+            'training_label_timespan': '1 day'
         }
     },
     {
@@ -201,9 +201,9 @@ print(result)
             ],
             'matrix_end_time': datetime.datetime(2010, 1, 13, 0, 0),
             'matrix_start_time': datetime.datetime(2010, 1, 8, 0, 0),
-            'test_data_frequency': '3 days',
-            'test_prediction_span': '3 days',
-            'test_span': '5 days'
+            'test_as_of_date_frequency': '3 days',
+            'test_label_timespan': '3 days',
+            'test_duration': '5 days'
         }],
         'train_matrix': {
             'as_of_times': [
@@ -217,8 +217,8 @@ print(result)
             'matrix_end_time': datetime.datetime(2010, 1, 7, 0, 0),
             'matrix_start_time': datetime.datetime(2010, 1, 2, 0, 0),
             'max_training_history': '5 days',
-            'training_data_frequency': '1 days',
-            'training_prediction_span': '1 day'
+            'training_as_of_date_frequency': '1 days',
+            'training_label_timespan': '1 day'
         }
     }
 ]

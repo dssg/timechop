@@ -58,8 +58,9 @@ print(result)
             'as_of_times': [
                 datetime.datetime(2014, 7, 1, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2014, 7, 1, 0, 0),
-            'matrix_start_time': datetime.datetime(2014, 7, 1, 0, 0),
+            'last_as_of_time': datetime.datetime(2014, 7, 1, 0, 0),
+            'first_as_of_time': datetime.datetime(2014, 7, 1, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2015, 1, 1, 0, 0),
             'test_as_of_date_frequency': '1 days',
             'test_label_timespan': '6 months',
             'test_duration': '0 days'
@@ -68,8 +69,9 @@ print(result)
             'as_of_times': [
                 datetime.datetime(2014, 1, 1, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2014, 1, 1, 0, 0),
-            'matrix_start_time': datetime.datetime(2014, 1, 1, 0, 0),
+            'last_as_of_time': datetime.datetime(2014, 1, 1, 0, 0),
+            'first_as_of_time': datetime.datetime(2014, 1, 1, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2014, 7, 1, 0, 0),
             'max_training_history': '2 years',
             'training_as_of_date_frequency': '6 months',
             'training_label_timespan': '6 months'
@@ -84,8 +86,9 @@ print(result)
             'as_of_times': [
                 datetime.datetime(2015, 7, 1, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2015, 7, 1, 0, 0),
-            'matrix_start_time': datetime.datetime(2015, 7, 1, 0, 0),
+            'last_as_of_time': datetime.datetime(2015, 7, 1, 0, 0),
+            'first_as_of_time': datetime.datetime(2015, 7, 1, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2016, 1, 1, 0, 0),
             'test_as_of_date_frequency': '1 days',
             'test_label_timespan': '6 months',
             'test_duration': '0 days'
@@ -96,8 +99,9 @@ print(result)
                 datetime.datetime(2014, 7, 1, 0, 0),
                 datetime.datetime(2015, 1, 1, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2015, 1, 1, 0, 0),
-            'matrix_start_time': datetime.datetime(2014, 1, 1, 0, 0),
+            'last_as_of_time': datetime.datetime(2015, 1, 1, 0, 0),
+            'first_as_of_time': datetime.datetime(2014, 1, 1, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2015, 7, 1, 0, 0),
             'max_training_history': '2 years',
             'training_as_of_date_frequency': '6 months',
             'training_label_timespan': '6 months'
@@ -112,8 +116,9 @@ print(result)
             'as_of_times': [
                 datetime.datetime(2016, 7, 1, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2016, 7, 1, 0, 0),
-            'matrix_start_time': datetime.datetime(2016, 7, 1, 0, 0),
+            'last_as_of_time': datetime.datetime(2016, 7, 1, 0, 0),
+            'first_as_of_time': datetime.datetime(2016, 7, 1, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2017, 1, 1, 0, 0),
             'test_as_of_date_frequency': '1 days',
             'test_label_timespan': '6 months',
             'test_duration': '0 days'
@@ -126,8 +131,9 @@ print(result)
                 datetime.datetime(2015, 7, 1, 0, 0),
                 datetime.datetime(2016, 1, 1, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2016, 1, 1, 0, 0),
-            'matrix_start_time': datetime.datetime(2014, 1, 1, 0, 0),
+            'last_as_of_time': datetime.datetime(2016, 1, 1, 0, 0),
+            'first_as_of_time': datetime.datetime(2014, 1, 1, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2016, 7, 1, 0, 0),
             'max_training_history': '2 years',
             'training_as_of_date_frequency': '6 months',
             'training_label_timespan': '6 months'
@@ -171,8 +177,9 @@ print(result)
                 datetime.datetime(2010, 1, 3, 0, 0),
                 datetime.datetime(2010, 1, 6, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2010, 1, 8, 0, 0),
-            'matrix_start_time': datetime.datetime(2010, 1, 3, 0, 0),
+            'last_as_of_time': datetime.datetime(2010, 1, 6, 0, 0),
+            'first_as_of_time': datetime.datetime(2010, 1, 3, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2010, 1, 9, 0, 0),
             'test_as_of_date_frequency': '3 days',
             'test_label_timespan': '3 days',
             'test_duration': '5 days'
@@ -182,8 +189,9 @@ print(result)
                 datetime.datetime(2010, 1, 1, 0, 0),
                 datetime.datetime(2010, 1, 2, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2010, 1, 2, 0, 0),
-            'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
+            'last_as_of_time': datetime.datetime(2010, 1, 2, 0, 0),
+            'first_as_of_time': datetime.datetime(2010, 1, 1, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2010, 1, 3, 0, 0),
             'max_training_history': '5 days',
             'training_as_of_date_frequency': '1 days',
             'training_label_timespan': '1 day'
@@ -199,8 +207,9 @@ print(result)
                 datetime.datetime(2010, 1, 8, 0, 0),
                 datetime.datetime(2010, 1, 11, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2010, 1, 13, 0, 0),
-            'matrix_start_time': datetime.datetime(2010, 1, 8, 0, 0),
+            'last_as_of_time': datetime.datetime(2010, 1, 11, 0, 0),
+            'first_as_of_time': datetime.datetime(2010, 1, 8, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2010, 1, 14, 0, 0),
             'test_as_of_date_frequency': '3 days',
             'test_label_timespan': '3 days',
             'test_duration': '5 days'
@@ -214,8 +223,9 @@ print(result)
                 datetime.datetime(2010, 1, 6, 0, 0),
                 datetime.datetime(2010, 1, 7, 0, 0)
             ],
-            'matrix_end_time': datetime.datetime(2010, 1, 7, 0, 0),
-            'matrix_start_time': datetime.datetime(2010, 1, 2, 0, 0),
+            'last_as_of_time': datetime.datetime(2010, 1, 7, 0, 0),
+            'first_as_of_time': datetime.datetime(2010, 1, 2, 0, 0),
+            'matrix_info_end_time': datetime.datetime(2010, 1, 8, 0, 0),
             'max_training_history': '5 days',
             'training_as_of_date_frequency': '1 days',
             'training_label_timespan': '1 day'

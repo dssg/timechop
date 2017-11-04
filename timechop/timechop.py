@@ -431,12 +431,10 @@ class Timechop(object):
 
         # create a dict of the matrix metadata
         matrix_definition = {
-            'matrix_start_time': earliest_possible_train_as_of_time, #rename to 'earliest as of time'?
-            'matrix_end_time': ( # make this just split time, rename to 'information cutoff time'?
-                train_test_split_time - training_prediction_delta
-            ),
+            'first_as_of_time': min(train_as_of_times),
+            'last_as_of_time': max(train_as_of_times),
+            'matrix_info_end_time': train_test_split_time,
             'as_of_times': train_as_of_times,
-            # last as of time as new matrix definition parameter
             'training_label_timespan': training_label_timespan,
             'training_as_of_date_frequency': training_as_of_date_frequency,
             'max_training_history': max_training_history
@@ -514,8 +512,11 @@ class Timechop(object):
             )
             logging.info('Test as of times: {}'.format(test_as_of_times))
             test_definition = {
-                'matrix_start_time': train_test_split_time,
-                'matrix_end_time': as_of_time_limit,
+                'first_as_of_time': train_test_split_time,
+                'last_as_of_time': max(test_as_of_times),
+                'matrix_info_end_time': \
+                    max(test_as_of_times) + \
+                    utils.convert_str_to_relativedelta(test_label_timespan),
                 'as_of_times': test_as_of_times,
                 'test_label_timespan': test_label_timespan,
                 'test_as_of_date_frequency': test_as_of_date_frequency,

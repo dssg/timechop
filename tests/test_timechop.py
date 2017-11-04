@@ -162,8 +162,9 @@ class test_generate_matrix_definitions(TestCase):
             'feature_end_time': datetime.datetime(2010, 1, 11, 0, 0),
             'label_end_time': datetime.datetime(2010, 1, 11, 0, 0),
             'train_matrix': {
-                'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                'matrix_end_time': datetime.datetime(2010, 1, 5, 0, 0),
+                'first_as_of_time': datetime.datetime(2010, 1, 1, 0, 0),
+                'last_as_of_time': datetime.datetime(2010, 1, 5, 0, 0),
+                'matrix_info_end_time': datetime.datetime(2010, 1, 6, 0, 0),
                 'as_of_times': [
                     datetime.datetime(2010, 1, 1, 0, 0),
                     datetime.datetime(2010, 1, 2, 0, 0),
@@ -176,8 +177,9 @@ class test_generate_matrix_definitions(TestCase):
                 'max_training_history': '5 days'
             },
             'test_matrices': [{
-                'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                'first_as_of_time': datetime.datetime(2010, 1, 6, 0, 0),
+                'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                 'as_of_times': [
                     datetime.datetime(2010, 1, 6, 0, 0),
                     datetime.datetime(2010, 1, 9, 0, 0),
@@ -217,8 +219,9 @@ class test_generate_matrix_definitions(TestCase):
             'feature_end_time': datetime.datetime(2010, 1, 11, 0, 0),
             'label_end_time': datetime.datetime(2010, 1, 11, 0, 0),
             'train_matrix': {
-                'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                'matrix_end_time': datetime.datetime(2010, 1, 5, 0, 0),
+                'first_as_of_time': datetime.datetime(2010, 1, 1, 0, 0),
+                'last_as_of_time': datetime.datetime(2010, 1, 5, 0, 0),
+                'matrix_info_end_time': datetime.datetime(2010, 1, 6, 0, 0),
                 'as_of_times': [
                     datetime.datetime(2010, 1, 1, 0, 0),
                     datetime.datetime(2010, 1, 2, 0, 0),
@@ -232,8 +235,9 @@ class test_generate_matrix_definitions(TestCase):
             },
             'test_matrices': [
                 {
-                    'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 6, 0, 0),
                         datetime.datetime(2010, 1, 9, 0, 0)
@@ -243,8 +247,9 @@ class test_generate_matrix_definitions(TestCase):
                     'test_duration': '5 days'
                 },
                 {
-                    'matrix_start_time': datetime.datetime(2010, 1, 6, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 11, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 6, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 7, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 6, 0, 0),
                     ],
@@ -287,8 +292,9 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 1, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 5, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 1, 0, 0),
                         datetime.datetime(2010, 1, 2, 0, 0),
@@ -300,8 +306,9 @@ class test_chop_time(TestCase):
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 5, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 5, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
@@ -320,8 +327,9 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 4, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 4, 0, 0),
                         datetime.datetime(2010, 1, 5, 0, 0),
@@ -335,8 +343,9 @@ class test_chop_time(TestCase):
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 14, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 15, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 10, 0, 0),
                         datetime.datetime(2010, 1, 11, 0, 0),
@@ -374,8 +383,9 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 19, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 19, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 1, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 9, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 1, 0, 0),
                         datetime.datetime(2010, 1, 2, 0, 0),
@@ -387,8 +397,9 @@ class test_chop_time(TestCase):
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 9, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 14, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 13, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 18, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 9, 0, 0),
                         datetime.datetime(2010, 1, 10, 0, 0),
@@ -426,8 +437,9 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 1, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 1, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 5, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 1, 0, 0),
                         datetime.datetime(2010, 1, 2, 0, 0),
@@ -439,8 +451,9 @@ class test_chop_time(TestCase):
                     'max_training_history': '7 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 5, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 5, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
@@ -459,8 +472,9 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 2, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 2, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 2, 0, 0),
                         datetime.datetime(2010, 1, 3, 0, 0),
@@ -476,8 +490,9 @@ class test_chop_time(TestCase):
                     'max_training_history': '7 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 14, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 15, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 10, 0, 0),
                         datetime.datetime(2010, 1, 11, 0, 0),
@@ -515,8 +530,9 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 3, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 3, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 5, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 3, 0, 0),
                         datetime.datetime(2010, 1, 4, 0, 0)
@@ -526,8 +542,9 @@ class test_chop_time(TestCase):
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 5, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 5, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 5, 0, 0),
                         datetime.datetime(2010, 1, 6, 0, 0),
@@ -546,8 +563,9 @@ class test_chop_time(TestCase):
                 'feature_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'label_end_time': datetime.datetime(2010, 1, 16, 0, 0),
                 'train_matrix': {
-                    'matrix_start_time': datetime.datetime(2010, 1, 4, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 4, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 4, 0, 0),
                         datetime.datetime(2010, 1, 5, 0, 0),
@@ -561,8 +579,9 @@ class test_chop_time(TestCase):
                     'max_training_history': '5 days'
                 },
                 'test_matrices': [{
-                    'matrix_start_time': datetime.datetime(2010, 1, 10, 0, 0),
-                    'matrix_end_time': datetime.datetime(2010, 1, 15, 0, 0),
+                    'first_as_of_time': datetime.datetime(2010, 1, 10, 0, 0),
+                    'last_as_of_time': datetime.datetime(2010, 1, 14, 0, 0),
+                    'matrix_info_end_time': datetime.datetime(2010, 1, 15, 0, 0),
                     'as_of_times': [
                         datetime.datetime(2010, 1, 10, 0, 0),
                         datetime.datetime(2010, 1, 11, 0, 0),

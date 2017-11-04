@@ -184,7 +184,8 @@ class test_generate_matrix_definitions(TestCase):
                 'last_as_of_time': datetime.datetime(2010, 1, 9, 0, 0),
                 'matrix_info_end_time': datetime.datetime(2010, 1, 10, 0, 0),
                 'as_of_times': [
-                    datetime.datetime(2010, 1, 6, 0, 0)
+                    datetime.datetime(2010, 1, 6, 0, 0),
+                    datetime.datetime(2010, 1, 9, 0, 0)
                 ],
                 'test_label_timespan': '1 day',
                 'test_as_of_date_frequency': '3 days',
@@ -536,7 +537,6 @@ class test_chop_time(TestCase):
                     'last_as_of_time': datetime.datetime(2010, 1, 4, 0, 0),
                     'matrix_info_end_time': datetime.datetime(2010, 1, 5, 0, 0),
                     'as_of_times': [
-                        datetime.datetime(2010, 1, 2, 0, 0),
                         datetime.datetime(2010, 1, 3, 0, 0),
                         datetime.datetime(2010, 1, 4, 0, 0)
                     ],

@@ -1,9 +1,7 @@
 # timechop
 
 [![Build Status](https://travis-ci.org/dssg/timechop.svg?branch=master)](https://travis-ci.org/dssg/timechop)
-
 [![codecov](https://codecov.io/gh/dssg/timechop/branch/master/graph/badge.svg)](https://codecov.io/gh/dssg/timechop)
-
 [![codeclimate](https://codeclimate.com/github/dssg/timechop.png)](https://codeclimate.com/github/dssg/timechop)
 
 Generate temporal validation time windows for matrix creation

@@ -1,12 +1,14 @@
 # timechop
-Generate temporal validation time windows for matrix creation
-
 
 [![Build Status](https://travis-ci.org/dssg/timechop.svg?branch=master)](https://travis-ci.org/dssg/timechop)
-
 [![codecov](https://codecov.io/gh/dssg/timechop/branch/master/graph/badge.svg)](https://codecov.io/gh/dssg/timechop)
-
 [![codeclimate](https://codeclimate.com/github/dssg/timechop.png)](https://codeclimate.com/github/dssg/timechop)
+
+Generate temporal validation time windows for matrix creation
+
+**Note**: Timechop is now a bundled component of [Triage](https://github.com/dssg/triage), and future development will take place there. To utilize Timechop within your custom pipeline, you may still import it from there.
+
+---
 
 In predictive analytics, temporal validation can be complicated. There are a variety of questions to balance: How frequently to retrain models? Should the time between rows for the same entity in the train and test matrices be different? Keeping track of how to create matrix time windows that successfully answer all of these questions is difficult. 
 

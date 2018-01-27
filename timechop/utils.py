@@ -52,6 +52,10 @@ def convert_str_to_relativedelta(delta_string):
     return(delta)
 
 def parse_delta_string(delta_string):
+    # allow the parsing of postgres deltas specified as P1M P3M or P1Y    
+    if len(delta_string) == 3:
+        delta_string=delta_string[1:]
+
     if len(delta_string.split(' ')) == 2:
         units = delta_string.split(' ')[1]
         try:
